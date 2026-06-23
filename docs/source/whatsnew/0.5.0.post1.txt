@@ -1,0 +1,19 @@
+Release 0.5.0.post1
+===================
+
+:Release: 0.5.0.post1
+:Date: 2026-06-22
+
+This is an ActiveState maintenance release on top of the upstream 0.5.0
+release. (Upstream tagged a 0.5.1 but never published it to PyPI, so 0.5.0
+remains the last released version; this post-release is based on it.)
+
+Bug Fixes
+---------
+
+* Load the ``Iterator`` and ``Iterable`` abstract base classes from
+  ``collections.abc`` instead of ``collections``. These ABCs were moved to
+  ``collections.abc`` in Python 3.3 and removed from the ``collections``
+  top-level namespace in Python 3.10, so importing them from ``collections``
+  raised ``ImportError`` on modern Python. ``namedtuple`` continues to be
+  imported from ``collections`` where it still lives.

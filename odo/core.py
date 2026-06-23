@@ -96,7 +96,7 @@ def path(graph, source, target, excluded_edges=None, ooc_types=ooc_types):
 
 
 # Catch-all subclasses
-from collections import Iterator
+from collections.abc import Iterator
 import numpy as np
 valid_subclasses = [Iterator, np.ndarray]
 
