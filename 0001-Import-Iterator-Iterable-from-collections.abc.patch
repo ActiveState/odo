@@ -1,0 +1,228 @@
+From 7640bf7d3b9ed27339db7ca49001f05d111e5317 Mon Sep 17 00:00:00 2001
+From: icanhasmath <marcg@activestate.com>
+Date: Mon, 22 Jun 2026 22:42:14 -0500
+Subject: [PATCH] Import Iterator/Iterable from collections.abc
+
+The Iterator and Iterable abstract base classes were moved to
+collections.abc in Python 3.3, and importing them from the collections
+top-level namespace was deprecated and removed in Python 3.10. Import
+them from collections.abc so odo works on modern Python. namedtuple
+continues to be imported from collections where it still lives.
+
+Fixes #626.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ odo/backends/aws.py            | 2 +-
+ odo/backends/dask.py           | 2 +-
+ odo/backends/hdfs.py           | 3 ++-
+ odo/backends/json.py           | 2 +-
+ odo/backends/mongo.py          | 2 +-
+ odo/backends/sas.py            | 2 +-
+ odo/backends/sparksql.py       | 2 +-
+ odo/backends/sql.py            | 2 +-
+ odo/backends/tests/test_csv.py | 2 +-
+ odo/backends/tests/test_sas.py | 2 +-
+ odo/backends/text.py           | 2 +-
+ odo/chunks.py                  | 2 +-
+ odo/convert.py                 | 2 +-
+ odo/core.py                    | 3 ++-
+ odo/tests/test_convert.py      | 2 +-
+ 15 files changed, 17 insertions(+), 15 deletions(-)
+
+diff --git a/odo/backends/aws.py b/odo/backends/aws.py
+index f81c5eb..6ba68ab 100644
+--- a/odo/backends/aws.py
++++ b/odo/backends/aws.py
+@@ -6,7 +6,7 @@ import zlib
+ import re
+ from fnmatch import fnmatch
+ from contextlib import contextmanager
+-from collections import Iterator
++from collections.abc import Iterator
+ from operator import attrgetter
+ from io import BytesIO
+ 
+diff --git a/odo/backends/dask.py b/odo/backends/dask.py
+index bf66d53..598283d 100644
+--- a/odo/backends/dask.py
++++ b/odo/backends/dask.py
+@@ -1,5 +1,5 @@
+ from __future__ import absolute_import, division, print_function
+-from collections import Iterator
++from collections.abc import Iterator
+ 
+ import numpy as np
+ import pandas as pd
+diff --git a/odo/backends/hdfs.py b/odo/backends/hdfs.py
+index ab3bd61..8718dec 100644
+--- a/odo/backends/hdfs.py
++++ b/odo/backends/hdfs.py
+@@ -14,7 +14,8 @@ import datashape
+ import sqlalchemy as sa
+ from datashape import discover
+ from datashape import coretypes as ct
+-from collections import namedtuple, Iterator
++from collections import namedtuple
++from collections.abc import Iterator
+ from contextlib import contextmanager
+ from .ssh import SSH
+ from .sql import metadata_of_engine
+diff --git a/odo/backends/json.py b/odo/backends/json.py
+index e4e4dcf..fd4420f 100644
+--- a/odo/backends/json.py
++++ b/odo/backends/json.py
+@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
+ 
+ import json
+ from toolz.curried import map, take, pipe, pluck, get, concat, filter
+-from collections import Iterator, Iterable
++from collections.abc import Iterator, Iterable
+ import os
+ from contextlib import contextmanager
+ 
+diff --git a/odo/backends/mongo.py b/odo/backends/mongo.py
+index ce56910..90539bc 100644
+--- a/odo/backends/mongo.py
++++ b/odo/backends/mongo.py
+@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
+ 
+ import pymongo
+ from pymongo.collection import Collection
+-from collections import Iterator
++from collections.abc import Iterator
+ from datashape import discover, DataShape, Record, var
+ from datashape.predicates import isdimension
+ from datashape.dispatch import dispatch
+diff --git a/odo/backends/sas.py b/odo/backends/sas.py
+index 9b4cb16..a90354f 100644
+--- a/odo/backends/sas.py
++++ b/odo/backends/sas.py
+@@ -5,7 +5,7 @@ from sas7bdat import SAS7BDAT
+ 
+ import datashape
+ from datashape import discover, dshape, var, Record, date_, datetime_
+-from collections import Iterator
++from collections.abc import Iterator
+ import pandas as pd
+ from .pandas import coerce_datetimes
+ from ..append import append
+diff --git a/odo/backends/sparksql.py b/odo/backends/sparksql.py
+index 80e27ad..17dd939 100644
+--- a/odo/backends/sparksql.py
++++ b/odo/backends/sparksql.py
+@@ -7,7 +7,7 @@ import tempfile
+ import shutil
+ 
+ from functools import partial
+-from collections import Iterator
++from collections.abc import Iterator
+ from datetime import datetime, date
+ 
+ import pandas as pd
+diff --git a/odo/backends/sql.py b/odo/backends/sql.py
+index 801ca66..e1010b6 100644
+--- a/odo/backends/sql.py
++++ b/odo/backends/sql.py
+@@ -11,7 +11,7 @@ from functools import partial
+ 
+ from operator import attrgetter
+ from itertools import chain
+-from collections import Iterator
++from collections.abc import Iterator
+ from datetime import datetime, date, timedelta
+ from distutils.spawn import find_executable
+ 
+diff --git a/odo/backends/tests/test_csv.py b/odo/backends/tests/test_csv.py
+index 11b29e0..ee65b15 100644
+--- a/odo/backends/tests/test_csv.py
++++ b/odo/backends/tests/test_csv.py
+@@ -10,7 +10,7 @@ import pandas.util.testing as tm
+ import gzip
+ import datashape
+ from datashape import Option, string
+-from collections import Iterator
++from collections.abc import Iterator
+ 
+ from odo.backends.csv import (CSV, append, convert, resource,
+                               csv_to_dataframe, CSV_to_chunks_of_dataframes,
+diff --git a/odo/backends/tests/test_sas.py b/odo/backends/tests/test_sas.py
+index c1a38bc..3544d1b 100644
+--- a/odo/backends/tests/test_sas.py
++++ b/odo/backends/tests/test_sas.py
+@@ -5,7 +5,7 @@ sas7bdat = pytest.importorskip('sas7bdat')
+ pytest.importorskip('odo.backends.sas')
+ import os
+ import pandas as pd
+-from collections import Iterator
++from collections.abc import Iterator
+ from sas7bdat import SAS7BDAT
+ 
+ from odo.backends.sas import discover, sas_to_iterator
+diff --git a/odo/backends/text.py b/odo/backends/text.py
+index 074f4ac..35af803 100644
+--- a/odo/backends/text.py
++++ b/odo/backends/text.py
+@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
+ 
+ import gzip
+ from datashape import discover, dshape
+-from collections import Iterator
++from collections.abc import Iterator
+ from toolz import partial, concat
+ import uuid
+ import os
+diff --git a/odo/chunks.py b/odo/chunks.py
+index 3a9e3c0..4ee7d0b 100644
+--- a/odo/chunks.py
++++ b/odo/chunks.py
+@@ -1,6 +1,6 @@
+ from __future__ import absolute_import, division, print_function
+ 
+-from collections import Iterator
++from collections.abc import Iterator
+ 
+ from toolz import memoize, first, peek
+ from datashape import discover, var
+diff --git a/odo/convert.py b/odo/convert.py
+index b9c4e41..f5c217b 100644
+--- a/odo/convert.py
++++ b/odo/convert.py
+@@ -4,7 +4,7 @@ import numpy as np
+ import pandas as pd
+ from datashape.predicates import isscalar
+ from toolz import concat, partition_all, compose
+-from collections import Iterator, Iterable
++from collections.abc import Iterator, Iterable
+ import datashape
+ from datashape import discover
+ from .core import NetworkDispatcher, ooc_types
+diff --git a/odo/core.py b/odo/core.py
+index 93b43c9..4d30f55 100644
+--- a/odo/core.py
++++ b/odo/core.py
+@@ -1,6 +1,7 @@
+ from __future__ import absolute_import, division, print_function
+ 
+-from collections import namedtuple, Iterator
++from collections import namedtuple
++from collections.abc import Iterator
+ from contextlib import contextmanager
+ from warnings import warn
+ 
+diff --git a/odo/tests/test_convert.py b/odo/tests/test_convert.py
+index d75857d..e39af6d 100644
+--- a/odo/tests/test_convert.py
++++ b/odo/tests/test_convert.py
+@@ -7,7 +7,7 @@ from odo.convert import (convert, list_to_numpy, iterator_to_numpy_chunks,
+                          iterator_to_DataFrame_chunks)
+ from odo.chunks import chunks
+ from datashape import discover, dshape
+-from collections import Iterator
++from collections.abc import Iterator
+ import datetime
+ import datashape
+ import numpy as np
+-- 
+2.43.0
+

@@ -1,0 +1,16 @@
+Release 0.5.0.post2
+===================
+
+:Release: 0.5.0.post2
+:Date: 2026-06-23
+
+This is an ActiveState maintenance release on top of 0.5.0.post1.
+
+Bug Fixes
+---------
+
+* Register the NaT conversion edge against ``type(pd.NaT)`` instead of
+  ``pd.tslib.NaTType``. The ``pandas.tslib`` module was removed in pandas
+  0.24, so importing odo raised ``AttributeError: module 'pandas' has no
+  attribute 'tslib'`` on modern pandas (blaze/odo:issue:`621`). This ports
+  the upstream fix from commit e0e26ca.
